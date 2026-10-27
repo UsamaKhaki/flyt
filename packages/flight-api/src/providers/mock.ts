@@ -100,7 +100,9 @@ function stopsFor(distance: number, random: () => number): number {
   const roll = random();
   if (distance < 1500) return roll < 0.8 ? 0 : 1;
   if (distance < 6000) return roll < 0.5 ? 0 : roll < 0.9 ? 1 : 2;
-  return roll < 0.3 ? 0 : roll < 0.8 ? 1 : 2;
+  if (distance < 12000) return roll < 0.3 ? 0 : roll < 0.8 ? 1 : 2;
+  // Beyond the range of almost every scheduled nonstop service.
+  return roll < 0.7 ? 1 : 2;
 }
 
 function connectionsFor(

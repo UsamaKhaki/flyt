@@ -39,6 +39,11 @@ describe('mock provider search', () => {
     }
   });
 
+  it('never offers nonstop flights on ultra-long routes', async () => {
+    const offers = await provider.search(query);
+    expect(offers.every((offer) => offer.outbound.stops >= 1)).toBe(true);
+  });
+
   it('reports a leg duration that matches its first departure and last arrival', async () => {
     const [offer] = await provider.search({ ...query, returnDate: undefined });
     const { segments, durationMinutes } = offer!.outbound;
