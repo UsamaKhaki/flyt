@@ -1,0 +1,23 @@
+{
+  "name": "@flyt/flight-api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@flyt/config": "workspace:*",
+    "eslint": "^9.37.0",
+    "typescript": "~5.9.3",
+    "vitest": "^3.2.4"
+  }
+}
