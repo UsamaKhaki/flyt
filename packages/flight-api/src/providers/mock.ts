@@ -28,7 +28,7 @@ const MOCK_AGENTS = [
   { id: 'skylark', name: 'Skylark Travel' },
   { id: 'bluefin', name: 'Bluefin Fares' },
   { id: 'kite', name: 'Kite Tickets' },
-  { id: 'carrier-direct', name: 'Book with the airline' },
+  { id: 'gatewise', name: 'Gatewise Travel' },
 ] as const;
 
 const HUBS: readonly IataCode[] = ['DXB', 'DOH', 'IST', 'FRA', 'AMS', 'SIN', 'LHR', 'JFK'];
@@ -105,29 +105,43 @@ function stopsFor(distance: number, random: () => number): number {
   return roll < 0.7 ? 1 : 2;
 }
 
+function routeKm(from: Airport, hubs: readonly Airport[], to: Airport): number {
+  let total = 0;
+  let previous = from;
+  for (const stop of [...hubs, to]) {
+    total += distanceKm(previous, stop);
+    previous = stop;
+  }
+  return total;
+}
+
+const MAX_DETOUR = 1.5;
+
+// Picks connecting hubs whose whole route stays within MAX_DETOUR of the direct distance.
+// Returns fewer hubs than requested when no sensible two-stop routing exists.
 function connectionsFor(
   from: Airport,
   to: Airport,
   stops: number,
   random: () => number,
 ): Airport[] {
-  const candidates = HUBS.filter((code) => code !== from.iata && code !== to.iata).map(
-    requireAirport,
-  );
-  const direct = distanceKm(from, to);
-  // Prefer hubs that do not add a huge detour; fall back to any hub on odd routes.
-  const sensible = candidates.filter(
-    (hub) => distanceKm(from, hub) + distanceKm(hub, to) < direct * 1.5,
-  );
-  const pool = sensible.length >= stops ? sensible : candidates;
+  if (stops === 0) return [];
+  const hubs = HUBS.filter((code) => code !== from.iata && code !== to.iata).map(requireAirport);
+  const limit = distanceKm(from, to) * MAX_DETOUR;
 
-  const chosen: Airport[] = [];
-  while (chosen.length < stops) {
-    const hub = pick(pool, random);
-    if (!chosen.includes(hub)) chosen.push(hub);
-  }
-  // Fly the hubs in geographic order rather than zig-zagging between them.
-  return chosen.sort((a, b) => distanceKm(from, a) - distanceKm(from, b));
+  const oneStop = hubs.map((hub) => [hub]);
+  // Hubs are flown in order of distance from the origin, never zig-zagging back.
+  const twoStop = hubs.flatMap((a) =>
+    hubs.filter((b) => distanceKm(from, a) < distanceKm(from, b)).map((b) => [a, b]),
+  );
+
+  const reasonable = (routes: Airport[][]) =>
+    routes.filter((hubs) => routeKm(from, hubs, to) <= limit);
+
+  const goodTwoStop = stops >= 2 ? reasonable(twoStop) : [];
+  if (goodTwoStop.length > 0) return pick(goodTwoStop, random);
+  const goodOneStop = reasonable(oneStop);
+  return pick(goodOneStop.length > 0 ? goodOneStop : oneStop, random);
 }
 
 function buildLeg(
@@ -138,7 +152,8 @@ function buildLeg(
   carrier: Carrier,
   random: () => number,
 ): Leg {
-  const stopsAndDestination = [...connectionsFor(from, to, stops, random), to];
+  const connections = connectionsFor(from, to, stops, random);
+  const stopsAndDestination = [...connections, to];
   const departHour = 6 + Math.floor(random() * 17);
   const departMinute = roundTo5(random() * 55) % 60;
   let departUtc = localToUtcMs(
@@ -174,7 +189,7 @@ function buildLeg(
   return {
     segments,
     durationMinutes: Math.round((arriveUtc - legStartUtc) / 60_000),
-    stops,
+    stops: connections.length,
   };
 }
 
@@ -214,13 +229,19 @@ function generateOffers(query: SearchQuery): Offer[] {
   return Array.from({ length: count }, (_, index): Offer => {
     const carrier = pick(MOCK_CARRIERS, random);
     const agent = pick(MOCK_AGENTS, random);
-    const outboundStops = stopsFor(distance, random);
-    const outbound = buildLeg(from, to, query.departDate, outboundStops, carrier, random);
+    const outbound = buildLeg(
+      from,
+      to,
+      query.departDate,
+      stopsFor(distance, random),
+      carrier,
+      random,
+    );
     const inbound = query.returnDate
       ? buildLeg(to, from, query.returnDate, stopsFor(distance, random), carrier, random)
       : undefined;
 
-    let perAdult = farePerAdultMinor(distance, query.cabin, outboundStops, random);
+    let perAdult = farePerAdultMinor(distance, query.cabin, outbound.stops, random);
     if (inbound) perAdult *= 1.8;
 
     const id = `mock-${seed.toString(36)}-${index}`;

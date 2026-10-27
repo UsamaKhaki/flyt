@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { OfferSchema, type SearchQuery } from '../schemas';
 import { localToUtcMs } from '../time';
-import { findAirport } from '../airports';
+import { distanceKm, findAirport } from '../airports';
 import { createMockProvider } from './mock';
 
 const provider = createMockProvider({ today: () => '2026-11-01' });
@@ -36,6 +36,25 @@ describe('mock provider search', () => {
         expect(segments[i]?.from).toBe(segments[i - 1]?.to);
       }
       expect(offer.inbound?.segments[0]?.from).toBe('SYD');
+    }
+  });
+
+  it('keeps connections close to the direct route', async () => {
+    for (const route of [query, { ...query, origin: 'DXB', destination: 'BKK' }]) {
+      for (const offer of await provider.search(route)) {
+        const airports = [
+          offer.outbound.segments[0]!.from,
+          ...offer.outbound.segments.map((s) => s.to),
+        ];
+        const flown = airports
+          .slice(1)
+          .reduce(
+            (km, code, i) => km + distanceKm(findAirport(airports[i]!)!, findAirport(code)!),
+            0,
+          );
+        const direct = distanceKm(findAirport(route.origin)!, findAirport(route.destination)!);
+        expect(flown).toBeLessThanOrEqual(direct * 1.5);
+      }
     }
   });
 
