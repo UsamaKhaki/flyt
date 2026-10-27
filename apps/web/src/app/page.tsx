@@ -25,7 +25,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <section className="relative overflow-hidden">
+      <section className="relative">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,var(--color-amber-400)_0%,transparent_45%)] opacity-15"
