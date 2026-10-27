@@ -2,13 +2,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it } from 'vitest';
-import {
-  DateRangePicker,
-  formatIsoDate,
-  isoToLocalDate,
-  localDateToIso,
-  type IsoDateRange,
-} from './DateRangePicker';
+import { DateRangePicker, type IsoDateRange } from './DateRangePicker';
+import { formatIsoDate, isoToLocalDate, localDateToIso } from './dates';
 
 interface HarnessProps {
   oneWay?: boolean;
@@ -51,6 +46,15 @@ describe('DateRangePicker', () => {
     expect(screen.getByTestId('value')).toHaveTextContent(
       '{"from":"2026-12-01","to":"2026-12-08"}',
     );
+  });
+
+  it('starts a new range when a full range is already selected', async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+    await user.click(screen.getByRole('button', { name: /Return/ }));
+    await user.click(screen.getByRole('button', { name: /December 8th, 2026/ }));
+    await user.click(screen.getByRole('button', { name: /December 20th, 2026/ }));
+    expect(screen.getByTestId('value')).toHaveTextContent('{"from":"2026-12-20"}');
   });
 
   it('disables days before the minimum date', async () => {

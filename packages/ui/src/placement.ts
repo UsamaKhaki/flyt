@@ -1,6 +1,8 @@
 export interface Placement {
   side: 'bottom' | 'top';
   align: 'start' | 'end';
+  // Room left on the chosen side; the panel scrolls rather than leaving the viewport.
+  maxHeight: number;
 }
 
 interface TriggerRect {
@@ -33,5 +35,5 @@ export function computePlacement(
   const fitsFromRight = trigger.right - panel.width >= VIEWPORT_MARGIN;
   const align = fitsFromLeft || !fitsFromRight ? 'start' : 'end';
 
-  return { side, align };
+  return { side, align, maxHeight: Math.max(0, side === 'bottom' ? spaceBelow : spaceAbove) };
 }

@@ -13,6 +13,7 @@ describe('computePlacement', () => {
     expect(computePlacement(rect(100, 100), panel, viewport)).toEqual({
       side: 'bottom',
       align: 'start',
+      maxHeight: 768 - 148 - 8 - 8,
     });
   });
 
@@ -23,6 +24,12 @@ describe('computePlacement', () => {
   it('stays below when neither side fits but below has more room', () => {
     const tall = { width: 300, height: 900 };
     expect(computePlacement(rect(100, 200), tall, viewport).side).toBe('bottom');
+  });
+
+  it('caps the height to the room on the chosen side', () => {
+    const tall = { width: 300, height: 900 };
+    const placement = computePlacement(rect(100, 460), tall, viewport);
+    expect(placement).toMatchObject({ side: 'top', maxHeight: 460 - 8 - 8 });
   });
 
   it('right-aligns when the panel would overflow the right edge', () => {

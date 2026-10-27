@@ -3,7 +3,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it } from 'vitest';
-import { stepperBounds, summarizeTravellers, TravellerSelector } from './TravellerSelector';
+import { TravellerSelector } from './TravellerSelector';
+import { stepperBounds, summarizeTravellers } from './travellers';
 
 function Harness({ initial }: { initial: Travellers }) {
   const [value, setValue] = useState(initial);

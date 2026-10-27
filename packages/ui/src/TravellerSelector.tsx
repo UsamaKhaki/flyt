@@ -2,41 +2,13 @@
 
 import { CABIN_CLASSES, MAX_TRAVELLERS, type CabinClass, type Travellers } from '@flyt/flight-api';
 import { Dropdown } from './Dropdown';
-
-export const CABIN_LABELS: Record<CabinClass, string> = {
-  economy: 'Economy',
-  premium_economy: 'Premium economy',
-  business: 'Business',
-  first: 'First',
-};
-
-type TravellerKind = keyof Travellers;
+import { CABIN_LABELS, stepperBounds, summarizeTravellers, type TravellerKind } from './travellers';
 
 const ROWS: { kind: TravellerKind; label: string; hint: string }[] = [
   { kind: 'adults', label: 'Adults', hint: '12+ years' },
   { kind: 'children', label: 'Children', hint: '2 to 11' },
   { kind: 'infants', label: 'Infants', hint: 'Under 2, on lap' },
 ];
-
-// Mirrors the TravellersSchema rules so the steppers can never produce an invalid value.
-export function stepperBounds(value: Travellers, kind: TravellerKind) {
-  const total = value.adults + value.children + value.infants;
-  const roomLeft = MAX_TRAVELLERS - total;
-
-  switch (kind) {
-    case 'adults':
-      return { min: Math.max(1, value.infants), max: value.adults + roomLeft };
-    case 'children':
-      return { min: 0, max: value.children + roomLeft };
-    case 'infants':
-      return { min: 0, max: Math.min(value.adults, value.infants + roomLeft) };
-  }
-}
-
-export function summarizeTravellers(value: Travellers, cabin: CabinClass): string {
-  const total = value.adults + value.children + value.infants;
-  return `${total} ${total === 1 ? 'traveller' : 'travellers'}, ${CABIN_LABELS[cabin]}`;
-}
 
 export interface TravellerSelectorProps {
   value: Travellers;

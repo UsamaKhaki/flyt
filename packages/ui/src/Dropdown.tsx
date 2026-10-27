@@ -22,7 +22,11 @@ export interface DropdownProps {
 
 export function Dropdown({ trigger, label, children, className, triggerClassName }: DropdownProps) {
   const [open, setOpen] = useState(false);
-  const [placement, setPlacement] = useState<Placement>({ side: 'bottom', align: 'start' });
+  const [placement, setPlacement] = useState<Placement>({
+    side: 'bottom',
+    align: 'start',
+    maxHeight: Infinity,
+  });
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -97,7 +101,8 @@ export function Dropdown({ trigger, label, children, className, triggerClassName
           aria-label={label}
           data-side={placement.side}
           data-align={placement.align}
-          className={`absolute z-50 ${sideClass} ${alignClass} max-w-[calc(100vw-16px)] rounded-xl border border-ink-700 bg-ink-900 p-4 text-ink-50 shadow-2xl shadow-black/40`}
+          style={{ maxHeight: placement.maxHeight }}
+          className={`absolute z-50 ${sideClass} ${alignClass} w-max max-w-[calc(100vw-16px)] overflow-auto overscroll-contain rounded-xl border border-ink-700 bg-ink-900 p-4 text-ink-50 shadow-2xl shadow-black/40`}
         >
           {typeof children === 'function' ? children(close) : children}
         </div>
