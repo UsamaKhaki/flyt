@@ -1,0 +1,42 @@
+/* Design tokens shared by every Flyt app. Import after "tailwindcss". */
+@theme {
+  --color-ink-50: #f3f5fa;
+  --color-ink-100: #e3e8f2;
+  --color-ink-200: #c5cee0;
+  --color-ink-300: #9aa7c2;
+  --color-ink-400: #6f7f9f;
+  --color-ink-500: #4f5f80;
+  --color-ink-600: #3a4867;
+  --color-ink-700: #27334f;
+  --color-ink-800: #19233b;
+  --color-ink-900: #111a2e;
+  --color-ink-950: #0a1120;
+
+  --font-sans: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-space-mono), ui-monospace, monospace;
+}
+
+.rdp-root {
+  --rdp-accent-color: var(--color-amber-400);
+  --rdp-accent-background-color: color-mix(in oklab, var(--color-amber-400) 18%, transparent);
+  --rdp-day-height: 40px;
+  --rdp-day-width: 40px;
+  --rdp-today-color: var(--color-amber-300);
+}
+
+.rdp-months {
+  flex-wrap: wrap;
+}
+
+.rdp-range_middle .rdp-day_button {
+  color: var(--color-amber-100);
+}
+
+.rdp-selected .rdp-day_button {
+  font-weight: 600;
+}
+
+.rdp-range_start .rdp-day_button,
+.rdp-range_end .rdp-day_button {
+  color: var(--color-ink-950);
+}
