@@ -1,0 +1,16 @@
+@import 'tailwindcss';
+/* Day picker defaults first, so the Flyt theme in @flyt/ui can override them. */
+@import 'react-day-picker/style.css';
+@import '@flyt/ui/styles.css';
+
+@source '../../../../packages/ui/src';
+
+@layer base {
+  body {
+    @apply bg-ink-950 font-sans text-ink-50 antialiased;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-amber-400;
+  }
+}

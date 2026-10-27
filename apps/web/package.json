@@ -1,0 +1,40 @@
+{
+  "name": "@flyt/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@flyt/flight-api": "workspace:*",
+    "@flyt/ui": "workspace:*",
+    "next": "~15.5.6",
+    "react": "^19.2.0",
+    "react-day-picker": "^9.14.0",
+    "react-dom": "^19.2.0",
+    "server-only": "^0.0.1",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@flyt/config": "workspace:*",
+    "@next/eslint-plugin-next": "~15.5.6",
+    "@tailwindcss/postcss": "^4.1.14",
+    "@testing-library/jest-dom": "~6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^22.18.0",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "eslint": "^9.37.0",
+    "jsdom": "^26.1.0",
+    "tailwindcss": "^4.1.14",
+    "typescript": "~5.9.3",
+    "vitest": "^3.2.4"
+  }
+}
