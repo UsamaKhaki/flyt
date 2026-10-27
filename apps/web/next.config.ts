@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   // Pin the workspace root; otherwise Next may pick up a lockfile from a parent directory.
   outputFileTracingRoot: fileURLToPath(new URL('../../', import.meta.url)),
+  // Browsers still probe /favicon.ico even when the page links an icon.
+  async rewrites() {
+    return [{ source: '/favicon.ico', destination: '/icon.svg' }];
+  },
 };
 
 export default nextConfig;
