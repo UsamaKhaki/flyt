@@ -82,7 +82,8 @@ export default async function FlightsPage({
 
   const sort = parseSort(rawParams);
   const filters = parseFilters(rawParams);
-  const visible = sortOffers(filterOffers(offers, filters), sort);
+  const filtered = filterOffers(offers, filters);
+  const visible = sortOffers(filtered, sort);
 
   const queryParams = searchQueryToParams(query);
   const toolbarParams = new URLSearchParams(queryParams);
@@ -114,7 +115,9 @@ export default async function FlightsPage({
 
       <ResultsToolbar
         params={toolbarParams}
-        offers={offers}
+        // Tab figures describe what is on screen; the airline list comes from every offer
+        // so a filtered-out airline can be switched back on.
+        offers={filtered}
         sort={sort}
         maxStops={filters.maxStops}
         carriers={uniqueCarriers(offers)}

@@ -77,7 +77,8 @@ export function SearchForm({ today, initial }: SearchFormProps) {
         ))}
       </fieldset>
 
-      <div className="grid gap-3 md:grid-cols-[1fr_auto_1fr] lg:grid-cols-[1fr_auto_1fr_1.3fr_1fr_auto] lg:items-end">
+      {/* minmax(0, ...) stops a long label like "9 travellers, Premium economy" widening its column. */}
+      <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_minmax(0,1.3fr)_minmax(0,1fr)_auto] lg:items-end">
         <AirportCombobox
           label="From"
           placeholder="City or airport"
