@@ -22,12 +22,8 @@ export interface DropdownProps {
 
 export function Dropdown({ trigger, label, children, className, triggerClassName }: DropdownProps) {
   const [open, setOpen] = useState(false);
-  const [placement, setPlacement] = useState<Placement>({
-    side: 'bottom',
-    align: 'start',
-    maxHeight: Infinity,
-    offsetX: 0,
-  });
+  // Null until the panel has been measured; it renders below and left-aligned until then.
+  const [placement, setPlacement] = useState<Placement | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -78,7 +74,7 @@ export function Dropdown({ trigger, label, children, className, triggerClassName
     };
   }, [open, close, updatePlacement]);
 
-  const sideClass = placement.side === 'bottom' ? 'top-full mt-2' : 'bottom-full mb-2';
+  const sideClass = placement?.side === 'top' ? 'bottom-full mb-2' : 'top-full mt-2';
 
   return (
     <div ref={rootRef} className={`relative ${className ?? ''}`}>
@@ -88,7 +84,11 @@ export function Dropdown({ trigger, label, children, className, triggerClassName
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls={open ? panelId : undefined}
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => {
+          // Re-measure from scratch on every open; the last height cap would skew the size.
+          if (!open) setPlacement(null);
+          setOpen(!open);
+        }}
         className={triggerClassName}
       >
         {trigger}
@@ -99,11 +99,11 @@ export function Dropdown({ trigger, label, children, className, triggerClassName
           id={panelId}
           role="dialog"
           aria-label={label}
-          data-side={placement.side}
-          data-align={placement.align}
+          data-side={placement?.side ?? 'bottom'}
+          data-align={placement?.align ?? 'start'}
           style={{
-            maxHeight: placement.maxHeight,
-            ...(placement.align === 'start' ? { left: placement.offsetX } : { right: 0 }),
+            maxHeight: placement?.maxHeight,
+            ...(placement?.align === 'end' ? { right: 0 } : { left: placement?.offsetX ?? 0 }),
           }}
           className={`absolute z-50 ${sideClass} w-max max-w-[calc(100vw-16px)] overflow-auto overscroll-contain rounded-xl border border-ink-700 bg-ink-900 p-4 text-ink-50 shadow-2xl shadow-black/40`}
         >
