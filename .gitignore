@@ -9,3 +9,11 @@ next-env.d.ts
 .env*.local
 .DS_Store
 .claude/
+CLAUDE.md
+CLAUDE.local.md
+AGENTS.md
+.cursor/
+.cursorrules
+.windsurfrules
+.github/copilot-instructions.md
+.aider*
