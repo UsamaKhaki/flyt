@@ -26,6 +26,7 @@ export function Dropdown({ trigger, label, children, className, triggerClassName
     side: 'bottom',
     align: 'start',
     maxHeight: Infinity,
+    offsetX: 0,
   });
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -78,7 +79,6 @@ export function Dropdown({ trigger, label, children, className, triggerClassName
   }, [open, close, updatePlacement]);
 
   const sideClass = placement.side === 'bottom' ? 'top-full mt-2' : 'bottom-full mb-2';
-  const alignClass = placement.align === 'start' ? 'left-0' : 'right-0';
 
   return (
     <div ref={rootRef} className={`relative ${className ?? ''}`}>
@@ -101,8 +101,11 @@ export function Dropdown({ trigger, label, children, className, triggerClassName
           aria-label={label}
           data-side={placement.side}
           data-align={placement.align}
-          style={{ maxHeight: placement.maxHeight }}
-          className={`absolute z-50 ${sideClass} ${alignClass} w-max max-w-[calc(100vw-16px)] overflow-auto overscroll-contain rounded-xl border border-ink-700 bg-ink-900 p-4 text-ink-50 shadow-2xl shadow-black/40`}
+          style={{
+            maxHeight: placement.maxHeight,
+            ...(placement.align === 'start' ? { left: placement.offsetX } : { right: 0 }),
+          }}
+          className={`absolute z-50 ${sideClass} w-max max-w-[calc(100vw-16px)] overflow-auto overscroll-contain rounded-xl border border-ink-700 bg-ink-900 p-4 text-ink-50 shadow-2xl shadow-black/40`}
         >
           {typeof children === 'function' ? children(close) : children}
         </div>

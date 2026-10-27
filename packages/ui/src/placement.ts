@@ -3,6 +3,8 @@ export interface Placement {
   align: 'start' | 'end';
   // Room left on the chosen side; the panel scrolls rather than leaving the viewport.
   maxHeight: number;
+  // Horizontal nudge in px for a start-aligned panel that fits neither edge (narrow screens).
+  offsetX: number;
 }
 
 interface TriggerRect {
@@ -20,7 +22,8 @@ interface Size {
 const VIEWPORT_MARGIN = 8;
 
 // Opens below the trigger unless the panel would overflow the viewport and there is more
-// room above. Aligns to the trigger's left edge unless that would run off the right side.
+// room above. Aligns to the trigger's left edge unless that would run off the right side,
+// and when the panel fits neither way it is nudged left until it is back on screen.
 export function computePlacement(
   trigger: TriggerRect,
   panel: Size,
@@ -35,5 +38,16 @@ export function computePlacement(
   const fitsFromRight = trigger.right - panel.width >= VIEWPORT_MARGIN;
   const align = fitsFromLeft || !fitsFromRight ? 'start' : 'end';
 
-  return { side, align, maxHeight: Math.max(0, side === 'bottom' ? spaceBelow : spaceAbove) };
+  let offsetX = 0;
+  if (align === 'start' && !fitsFromLeft) {
+    const overflow = trigger.left + panel.width - (viewport.width - VIEWPORT_MARGIN);
+    offsetX = -Math.min(overflow, trigger.left - VIEWPORT_MARGIN);
+  }
+
+  return {
+    side,
+    align,
+    maxHeight: Math.max(0, side === 'bottom' ? spaceBelow : spaceAbove),
+    offsetX,
+  };
 }

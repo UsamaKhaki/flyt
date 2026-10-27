@@ -14,6 +14,7 @@ describe('computePlacement', () => {
       side: 'bottom',
       align: 'start',
       maxHeight: 768 - 148 - 8 - 8,
+      offsetX: 0,
     });
   });
 
@@ -36,8 +37,18 @@ describe('computePlacement', () => {
     expect(computePlacement(rect(850, 100, 150), panel, viewport).align).toBe('end');
   });
 
-  it('falls back to left-aligned when the panel is wider than either option allows', () => {
-    const narrow = { width: 320, height: 768 };
-    expect(computePlacement(rect(40, 100, 100), panel, narrow).align).toBe('start');
+  it('nudges the panel back on screen when it fits neither edge', () => {
+    // A 375px phone, a 343px panel and a trigger that starts 33px from the left.
+    const phone = { width: 375, height: 812 };
+    const placement = computePlacement(rect(33, 100, 309), { width: 343, height: 300 }, phone);
+    expect(placement.align).toBe('start');
+    // 33 + 343 overflows 375 - 8 by 9px, so it moves 9px left.
+    expect(placement.offsetX).toBe(-9);
+  });
+
+  it('never nudges past the left margin', () => {
+    const phone = { width: 375, height: 812 };
+    const placement = computePlacement(rect(20, 100, 100), { width: 400, height: 300 }, phone);
+    expect(placement.offsetX).toBe(-12);
   });
 });

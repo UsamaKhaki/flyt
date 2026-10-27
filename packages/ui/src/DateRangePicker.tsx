@@ -32,6 +32,9 @@ export function DateRangePicker({
   const departLabel = value.from ? formatIsoDate(value.from) : 'Depart';
   const returnLabel = value.to ? formatIsoDate(value.to) : 'Return';
   const trigger = oneWay ? departLabel : `${departLabel} → ${returnLabel}`;
+  // The calendar only renders after a click, so reading the window here cannot cause a
+  // hydration mismatch. Phones get one month instead of two stacked ones.
+  const numberOfMonths = () => (window.innerWidth < 640 ? 1 : 2);
 
   return (
     <Dropdown
@@ -43,7 +46,7 @@ export function DateRangePicker({
         oneWay ? (
           <DayPicker
             mode="single"
-            numberOfMonths={2}
+            numberOfMonths={numberOfMonths()}
             defaultMonth={from}
             selected={from}
             disabled={disabled}
@@ -57,7 +60,7 @@ export function DateRangePicker({
             mode="range"
             // Once a full range is chosen, the next click starts a new trip instead of extending it.
             resetOnSelect
-            numberOfMonths={2}
+            numberOfMonths={numberOfMonths()}
             defaultMonth={from}
             selected={{ from, to }}
             disabled={disabled}
