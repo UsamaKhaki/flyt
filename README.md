@@ -6,7 +6,7 @@ Flyt asks airlines and travel agents for prices on a route, shows them side by s
 
 ![Flyt home page with the flight search form](docs/screenshots/home.png)
 
-**Demo video:** [docs/demo/flyt-demo.mp4](docs/demo/flyt-demo.mp4) (42 seconds, captioned, recorded from a local production build). Flyt is not deployed anywhere public yet; see [Getting started](#getting-started) to run it in about a minute.
+**Demo video:** [docs/demo/flyt-demo.mp4](docs/demo/flyt-demo.mp4) (42 seconds, captioned, recorded from a local production build). **Live demo:** <https://usamakhaki.github.io/flyt/>
 
 ---
 
@@ -34,7 +34,7 @@ Both panels use a shared `Dropdown` that measures itself before paint and opens 
 
 ### Results you can sort, filter and share
 
-`/flights` is server rendered from the URL, so a search is a link you can bookmark or send. Tabs sort by **Best** (price and journey time weighed equally), **Cheapest** or **Fastest**, and each tab shows the winning figure for the current filters. Stop and airline filters are plain links, so they work without client JavaScript and the back button behaves.
+`/flights` is driven entirely by the URL, so a search is a link you can bookmark or send. Tabs sort by **Best** (price and journey time weighed equally), **Cheapest** or **Fastest**, and each tab shows the winning figure for the current filters. Stop and airline filters are plain links, so the back button behaves.
 
 ![Results for London to Singapore](docs/screenshots/results.png)
 
@@ -99,7 +99,9 @@ flowchart LR
   pickers --> schemas
 ```
 
-A search is just a URL. The browser submits the form by navigating to `/flights?from=LHR&to=SIN&...`. The server component parses that through the shared Zod schema, asks the provider for offers, filters and sorts them, and renders HTML. No client state store, no API route in between.
+A search is just a URL. The browser submits the form by navigating to `/flights?from=LHR&to=SIN&...`. The page parses that through the shared Zod schema, asks the provider for offers, filters and sorts them, and renders the results. No client state store, no API route in between.
+
+The site is a static export served by GitHub Pages, so this all runs in the browser against the mock. A real supplier would need a server, to keep its token out of the bundle and to cache offers.
 
 ### Decisions worth calling out
 
@@ -108,7 +110,7 @@ A search is just a URL. The browser submits the form by navigating to `/flights?
 - **Times are local to each airport,** as on a ticket. The mock computes arrival from UTC offsets, which is how the "+1" day markers on overnight flights stay correct.
 - **The mock is deterministic.** A seeded PRNG keyed on route, dates and cabin means a results page, its `/go` redirect, a deal and a unit test all see identical offers. Travellers are left out of the seed: adding a passenger changes the total, not the flights. Routes are realistic enough to read: durations from great-circle distance, no nonstops on 17,000 km routes, and connections that stay within 1.5x the direct distance.
 - **Workspace packages ship TypeScript source.** Next compiles them via `transpilePackages`, so there is no package build step and no stale `dist` folders.
-- **Formatting helpers live outside `'use client'` files.** Server components import `formatIsoDate` and `summarizeTravellers` from `@flyt/ui`; if those lived in client modules, Next would turn them into client references and server rendering would fail. This was a real bug found while testing in the browser.
+- **Dates wait for the browser.** The HTML is exported at build time, so anything based on today, such as default search dates, is held back until the page is running. Otherwise a build from last week would offer dates in the past.
 
 ## Data model
 
@@ -144,15 +146,15 @@ Providers throw a typed `ProviderError` with a code (`invalid_query`, `not_confi
 
 ## Tech stack
 
-| Area       | Used                                                                                                        |
-| ---------- | ----------------------------------------------------------------------------------------------------------- |
-| Frontend   | Next.js 15.5 (App Router, server components), React 19, TypeScript 5.9 (strict, `noUncheckedIndexedAccess`) |
-| Styling    | Tailwind CSS 4 with shared theme tokens, Space Grotesk and Space Mono via `next/font`                       |
-| Components | react-day-picker 9 for the calendar; dropdown, combobox and steppers written in-house                       |
-| Validation | Zod 4 for queries, offers, environment config                                                               |
-| Monorepo   | pnpm 10 workspaces, Turborepo                                                                               |
-| Testing    | Vitest 3, Testing Library, jsdom                                                                            |
-| Tooling    | ESLint 9 (flat config, typescript-eslint, react-hooks, Next plugin), Prettier, GitHub Actions               |
+| Area       | Used                                                                                                    |
+| ---------- | ------------------------------------------------------------------------------------------------------- |
+| Frontend   | Next.js 15.5 (App Router, static export), React 19, TypeScript 5.9 (strict, `noUncheckedIndexedAccess`) |
+| Styling    | Tailwind CSS 4 with shared theme tokens, Space Grotesk and Space Mono via `next/font`                   |
+| Components | react-day-picker 9 for the calendar; dropdown, combobox and steppers written in-house                   |
+| Validation | Zod 4 for queries, offers, environment config                                                           |
+| Monorepo   | pnpm 10 workspaces, Turborepo                                                                           |
+| Testing    | Vitest 3, Testing Library, jsdom                                                                        |
+| Tooling    | ESLint 9 (flat config, typescript-eslint, react-hooks, Next plugin), Prettier, GitHub Actions           |
 
 ESLint 9 and TypeScript 5.9 are deliberate: Next 15 does not support the newer majors yet.
 
@@ -223,17 +225,17 @@ What the tests cover:
 - **ui:** placement maths (flip, align, nudge, height cap), stepper bounds, keyboard and outside-click closing, focus return, date range selection and reset.
 - **web:** URL parsing and round-tripping with clear messages for missing fields, provider selection from env, formatting, and the search form flow with a mocked router.
 
-Last local run: lint, typecheck, format check and build passed, and all 88 tests passed. Beyond unit tests, every page was clicked through in a browser at desktop and 375px width, and a headless Chromium script loaded each route at both sizes checking status codes, console errors and horizontal overflow. There are no committed end-to-end tests yet, and CI has not run on GitHub because the repository has not been pushed.
+Last local run: lint, typecheck, format check and build passed, and all 88 tests passed. Beyond unit tests, every page was clicked through in a browser at desktop and 375px width, and a headless Chromium script loaded each route at both sizes checking status codes, console errors and horizontal overflow. There are no committed end-to-end tests yet.
 
 ## Deployment
 
-Not deployed. The app is a standard Next.js build with no database or secrets in mock mode, so any Node host that runs `next start` would work, but no hosting is set up.
+GitHub Pages, at <https://usamakhaki.github.io/flyt/>. `.github/workflows/pages.yml` runs on every push to `main`, builds with `NEXT_PUBLIC_BASE_PATH=/flyt` and publishes `apps/web/out`.
 
 ## Status and limitations
 
 - **No live fares.** Travelpayouts is a stub that maps a search to its API URL and stops. Its Data API returns cached cheapest prices rather than full itineraries, so the real integration needs a mapping into the `Offer` shape and a decision about cabin and passenger data it does not carry.
 - **Mock simplifications.** Daylight saving is ignored (UTC offsets are standard time), prices are USD only, and airlines and agents are fictional on purpose so nobody mistakes them for real fares.
-- **`/go` re-runs the search.** Cheap with the mock; a real provider would need offers cached between the results page and the redirect.
+- **`/go` re-runs the search.** Instant with the mock; a real provider would need offers cached between the results page and the redirect.
 
 ## Roadmap
 

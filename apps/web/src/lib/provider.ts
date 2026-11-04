@@ -1,4 +1,3 @@
-import 'server-only';
 import {
   createMockProvider,
   createTravelpayoutsProvider,
@@ -30,6 +29,8 @@ export function createProviderFromEnv(env: Record<string, string | undefined>): 
 
 let provider: FlightProvider | undefined;
 
+// The site is a static export, so this runs in the browser, where process.env is empty and the
+// mock is always chosen. A real supplier needs a server to keep its token out of the bundle.
 export function getFlightProvider(): FlightProvider {
   provider ??= createProviderFromEnv(process.env);
   return provider;

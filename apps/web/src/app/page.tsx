@@ -1,12 +1,5 @@
 import Link from 'next/link';
-import { DealCard } from '@/components/DealCard';
-import { SearchForm } from '@/components/SearchForm';
-import { defaultTripDates, todayIso } from '@/lib/dates';
-import { getFlightProvider } from '@/lib/provider';
-
-// Default dates are relative to today, but an hour of staleness is harmless. Serving this
-// from the CDN keeps the most visited page from running a function on every request.
-export const revalidate = 3600;
+import { HomeDeals, HomeSearch } from '@/components/HomeSections';
 
 const HOME_ORIGIN = 'DXB';
 
@@ -19,11 +12,7 @@ const STEPS = [
   },
 ];
 
-export default async function HomePage() {
-  const today = todayIso();
-  const { departDate, returnDate } = defaultTripDates(today);
-  const deals = (await getFlightProvider().deals(HOME_ORIGIN)).slice(0, 4);
-
+export default function HomePage() {
   return (
     <>
       <section className="relative">
@@ -41,7 +30,7 @@ export default async function HomePage() {
             choose.
           </p>
           <div className="mt-10">
-            <SearchForm today={today} initial={{ origin: HOME_ORIGIN, departDate, returnDate }} />
+            <HomeSearch origin={HOME_ORIGIN} />
           </div>
         </div>
       </section>
@@ -59,11 +48,7 @@ export default async function HomePage() {
             All deals
           </Link>
         </div>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {deals.map((deal) => (
-            <DealCard key={deal.id} deal={deal} />
-          ))}
-        </div>
+        <HomeDeals origin={HOME_ORIGIN} />
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-12" aria-labelledby="how-heading">
