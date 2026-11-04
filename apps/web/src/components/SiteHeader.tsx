@@ -18,7 +18,7 @@ export function SiteHeader() {
           <ul className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-ink-300">
             {NAV.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="hover:text-amber-300">
+                <Link href={item.href} prefetch={false} className="hover:text-amber-300">
                   {item.label}
                 </Link>
               </li>

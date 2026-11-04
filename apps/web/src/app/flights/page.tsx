@@ -24,6 +24,7 @@ import {
 export const metadata: Metadata = {
   title: 'Flights',
   description: 'Compare flight prices across airlines and travel agents.',
+  robots: { index: false, follow: false },
 };
 
 function uniqueCarriers(offers: readonly Offer[]): Carrier[] {

@@ -8,6 +8,7 @@ import type { RawSearchParams } from '@/lib/search-params';
 export const metadata: Metadata = {
   title: 'Flight deals',
   description: 'The cheapest return fares we have seen recently from popular departure cities.',
+  robots: { index: false, follow: false },
 };
 
 const ORIGINS: readonly IataCode[] = ['DXB', 'LHR', 'JFK', 'SIN', 'KHI', 'BOM'];
@@ -38,6 +39,7 @@ export default async function DealsPage({
             key={code}
             href={`/deals?from=${code}`}
             aria-current={code === origin ? 'page' : undefined}
+            prefetch={false}
             className="rounded-full border border-ink-700 px-3 py-1 hover:border-ink-500 aria-[current]:border-amber-400 aria-[current]:text-amber-300"
           >
             {findAirport(code)?.city ?? code}

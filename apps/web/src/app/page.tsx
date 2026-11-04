@@ -4,8 +4,9 @@ import { SearchForm } from '@/components/SearchForm';
 import { defaultTripDates, todayIso } from '@/lib/dates';
 import { getFlightProvider } from '@/lib/provider';
 
-// Default dates are relative to today, so the page must render per request.
-export const dynamic = 'force-dynamic';
+// Default dates are relative to today, but an hour of staleness is harmless. Serving this
+// from the CDN keeps the most visited page from running a function on every request.
+export const revalidate = 3600;
 
 const HOME_ORIGIN = 'DXB';
 
@@ -52,6 +53,7 @@ export default async function HomePage() {
           </h2>
           <Link
             href={`/deals?from=${HOME_ORIGIN}`}
+            prefetch={false}
             className="text-sm text-amber-300 hover:underline"
           >
             All deals

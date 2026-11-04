@@ -19,6 +19,8 @@ export function DealCard({ deal }: { deal: Deal }) {
   return (
     <Link
       href={`/flights?${params}`}
+      prefetch={false}
+      rel="nofollow"
       className="group flex flex-col justify-between gap-6 rounded-xl border border-ink-700 bg-ink-900 p-5 hover:border-amber-400"
     >
       <div>

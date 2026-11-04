@@ -64,6 +64,8 @@ export function ResultsToolbar({
             href={hrefWith(params, { sort: tab.value === 'best' ? undefined : tab.value })}
             aria-current={sort === tab.value ? 'true' : undefined}
             scroll={false}
+            prefetch={false}
+            rel="nofollow"
             className="border-ink-700 px-3 py-3 not-last:border-r hover:bg-ink-900 aria-[current]:bg-ink-900 aria-[current]:shadow-[inset_0_-2px_0_var(--color-amber-400)]"
           >
             <span className="block font-semibold">{tab.label}</span>
@@ -81,6 +83,8 @@ export function ResultsToolbar({
               href={hrefWith(params, { stops: option.value?.toString() })}
               aria-current={maxStops === option.value ? 'true' : undefined}
               scroll={false}
+              prefetch={false}
+              rel="nofollow"
               className="rounded-full border border-ink-700 px-3 py-1 hover:border-ink-500 aria-[current]:border-amber-400 aria-[current]:text-amber-300"
             >
               {option.label}
@@ -101,6 +105,8 @@ export function ResultsToolbar({
                 href={hrefWith(params, { carriers: nextSelection.join(',') })}
                 aria-pressed={active}
                 scroll={false}
+                prefetch={false}
+                rel="nofollow"
                 className="rounded-full border border-ink-700 px-3 py-1 hover:border-ink-500 aria-pressed:border-amber-400 aria-pressed:text-amber-300"
               >
                 {carrier.name}
